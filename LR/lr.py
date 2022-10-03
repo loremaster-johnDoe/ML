@@ -49,8 +49,7 @@ class LinearRegression():
         Adjusted R-squared value
         """
         n = self.n_rows
-        k = self.features
-        return (1-(1-self.r2()**2)*(n-1)/ (n-k-1))
+        return (1-(1-self.r2()**2)*(n-1)/ (n-self.X.shape[1]))
     
     def var_estimator(self):
         """
@@ -60,7 +59,7 @@ class LinearRegression():
         K = # of covariates (including intercept)
         """
         e = self.y - self.y_hat()
-        return (1/(self.n_rows - self.features - 1))*np.dot(e.T, e)
+        return (1/(self.n_rows - self.X.shape[1]))*np.dot(e.T, e)
     
     def std_errors(self):
         """
@@ -69,7 +68,7 @@ class LinearRegression():
         the diagonal elements give the individual std. errors of the coefficients
         """
         XX = np.linalg.inv(np.dot(self.X.T, self.X))
-        return np.array([self.var_estimator()*XX[i][i] for i in range(self.features+1)])
+        return np.array([self.var_estimator()*XX[i][i] for i in range(self.X.shape[1])])
     
     def t_values(self):
         """
@@ -84,7 +83,7 @@ class LinearRegression():
         p-values of the coefficients under a two-tailed test assumption.
         Exact probability of committing a Type-1 error
         """
-        return 2*(1-scipy.stats.t.cdf(np.abs(self.t_values()), df = self.n_rows - self.features - 1))
+        return 2*(1-scipy.stats.t.cdf(np.abs(self.t_values()), df = self.n_rows - self.X.shape[1]))
     
     def F_stat(self):
         """
