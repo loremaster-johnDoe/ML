@@ -47,7 +47,7 @@ class LogisticRegression():
         return self
     
     def y_hat(self):
-        return self.sigmoid(self.X*self.coeffs_)
+        return self.sigmoid(np.dot(self.X, self.coeffs_))
     
     def log_odds(self):
         odds = self.y_hat()/(1-self.y_hat())
