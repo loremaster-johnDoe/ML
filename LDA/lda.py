@@ -49,8 +49,8 @@ class LDA():
         returns the llr value and the recommended class.
         """
         distinct_y = np.unique(self.y)
-        idx_i = np.where(distinct_y==i)[0][0]
-        idx_j = np.where(distinct_y==j)[0][0]
+        idx_i = np.where(distinct_y==class1)[0][0]
+        idx_j = np.where(distinct_y==class2)[0][0]
         
         prior_prob, means, cov = self.generate_params()
         
