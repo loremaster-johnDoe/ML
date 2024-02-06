@@ -9,6 +9,8 @@ class SVC():
         y : dependent binary var having values in the set {-1,1} (numpy array)
         C : regularization parameter
         add_intercept : adds an intercept column to the matrix of covariates, X
+        iter_ : no. of iterations
+        learning_rate : the learning rate parameter for updating beta coefficient
         Note : Categorical variables will have to be treated exogenously prior to using this code.
         """
         self.X = X
