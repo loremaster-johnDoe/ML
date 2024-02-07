@@ -40,7 +40,7 @@ class SVC():
     
     def fit(self):
         """
-        with the loss function being convex, the gradient for beta will eventually converge to a minima.
+        with the loss function being convex, the gradient will eventually help it converge to a minima.
         gradient_beta = Σ αi*yi*xi
         where αi = C for points that have ξi > 0 (well-behaving points)
         while, 0 < αi < C for points that have ξi = 0 (points that either lie on the margin or exceed beyond into the "other" territory.
