@@ -23,10 +23,6 @@ class LogisticRegression():
         self.hessian_tweak = hessian_tweak
         if add_intercept:
             self.X = np.hstack((np.ones((self.X.shape[0],1)), self.X))
-            self.features = self.X.shape[1] - 1
-        else:
-            self.features = self.X.shape[1]
-        self.n_rows = self.X.shape[0]
         self.coeffs_ = None
     
     
