@@ -63,7 +63,7 @@ class EM:
                 
                 # Convergence check
                 log_likelihood.append(np.sum(df[e]*np.log(lambda_est) - lambda_est*complete_data_times))
-                if np.abs(new_lambda_est - lambda_est) < tol:
+                if np.abs(new_lambda_est - lambda_est) < self.tol:
                     break
                 lambda_est = new_lambda_est
                 
@@ -122,7 +122,7 @@ class EM:
                 log_likelihood.append(ll)
                 
                 # Convergence check
-                if len(log_likelihood) > 1 and np.abs(log_likelihood[-1] - log_likelihood[-2]) < tol:
+                if len(log_likelihood) > 1 and np.abs(log_likelihood[-1] - log_likelihood[-2]) < self.tol:
                     break
                     
                 mu_est, lambda_est = new_mu_est, new_lambda_est
@@ -185,7 +185,7 @@ class EM:
                 log_likelihood.append(ll)
                 
                 # Convergence check
-                if len(log_likelihood) > 1 and np.abs(log_likelihood[-1] - log_likelihood[-2]) < tol:
+                if len(log_likelihood) > 1 and np.abs(log_likelihood[-1] - log_likelihood[-2]) < self.tol:
                     break
                     
                 mu_est, sigma_est = new_mu_est, new_sigma_est
@@ -247,7 +247,7 @@ class EM:
                 log_likelihood.append(ll)
                 
                 # Convergence check
-                if len(log_likelihood) > 1 and np.abs(log_likelihood[-1] - log_likelihood[-2]) < tol:
+                if len(log_likelihood) > 1 and np.abs(log_likelihood[-1] - log_likelihood[-2]) < self.tol:
                     break
                 
             if plot_dist:
@@ -281,7 +281,7 @@ class EM:
         
     
     def log_likelihood_convergence_plot(self):
-        ll = em_algorithm(plot_dist=False)[-1]
+        ll = self.em_algorithm(plot_dist=False)[-1]
         plt.figure(figsize=(12,6))
         plt.plot(ll, marker='o')
         plt.xlabel('Iteration')
