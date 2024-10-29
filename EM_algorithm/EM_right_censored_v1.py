@@ -18,7 +18,7 @@ class EM:
         time : numerical column containing right-censored (None/NaN) values
         event : binary column indicating occurence (1) or non-occurence (0) of event
         dist : the underlying distribution for which EM algorithm is tested.
-                Choose from among the following - [expon, invg, logn, pareto]
+                Choose from among the following - [expon, invg, logn, pareto, weib]
         max_iter : max no. of iterations allowed
         tol : convergence criteria for stopping the algorithm
         """
@@ -44,6 +44,10 @@ class EM:
         log_likelihood = []
         
         if self.dist == "expon":
+            
+#            if min(df[t]) > 0:
+#                print("Make sure the left tail of your data starts at 0 in order to use the Exponential distribution")
+#                raise AssertionError("Retry with revised left tail.")
             
             lambda_est = 1/np.nanmean(uncensored_data)
             
@@ -278,6 +282,64 @@ class EM:
                 plt.savefig("EM_Pareto_with_censoring.png")
                 
             return xm_est, alpha_est, log_likelihood
+
+        if self.dist == "weib":
+            
+            from scipy.stats import weibull_min
+            c_est, loc_est, scale_est = weibull_min.fit(uncensored_data, floc=0)
+            
+            for i in range(self.max_iter):
+                
+                # E-step:
+                censored = df[e] == False
+                complete_data_times = df[t].copy()
+                if np.sum(censored) > 0:
+                    max_censored_time = np.nanmax(uncensored_data)
+                    expected_tail_values = max_censored_time + weibull_min.rvs(c_est, scale=scale_est, size=np.sum(censored))
+                    complete_data_times[censored] = expected_tail_values
+                    
+                # M-step:
+                c_est, loc_est, scale_est = weibull_min.fit(complete_data_times, floc=0)
+                
+                if scale_est <= 0:
+                    scale_est = 1e-6
+                
+                # Calculate Log-likelihood
+                ll = np.sum(weibull_min.logpdf(complete_data_times, c_est, loc=loc_est, scale=scale_est))
+                log_likelihood.append(ll)
+                
+                # Convergence check
+                if len(log_likelihood) > 1 and np.abs(log_likelihood[-1] - log_likelihood[-2]) < self.tol:
+                    break
+                
+            if plot_dist:
+                
+                # Define the distribution
+                dist1 = weibull_min(c_est, loc=loc_est, scale=scale_est)
+                
+                # Generate values for plotting
+                x = np.linspace(0,np.nanmax(df[t]),1000)
+                y = dist1.pdf(x)
+                
+                # Plot the histogram of the uncensored data
+                plt.figure(figsize=(12,6))
+                plt.hist(uncensored_data, bins=int(max(uncensored_data)), density=True, alpha=0.6, color='g', label='Uncensored Data Histogram')
+                
+                # Plot the PDF of the distribution
+                plt.plot(x, y, label=f'Weibull Distribution (c={c_est:.4f}, scale={scale_est:.4f})', lw=2)
+                
+                # Mark the censoring threshold
+                plt.axvline(max(uncensored_data), color='r', linestyle='--', label=f'Censoring Threshold (x={max(uncensored_data):.2f})')
+                
+                # Add labels and legend
+                plt.xlabel('Value')
+                plt.ylabel('Probability Density')
+                plt.title('Weibull Distribution with Censoring Threshold')
+                plt.legend()
+                plt.grid(True)
+                plt.savefig("EM_Weibull_with_censoring.png")
+                
+            return c_est, loc_est, scale_est, log_likelihood
         
     
     def log_likelihood_convergence_plot(self):
